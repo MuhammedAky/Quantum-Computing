@@ -6,11 +6,24 @@ from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 
 class Qubit(metaclass = ABCMeta):
+
+    @abstractmethod
+    def swap(self, swap_target: "Qubit"): pass
+
+    @abstractmethod
+    def cnot(self, cnot_target: "Qubit"): pass
+
     @abstractmethod
     def h(self): pass
 
     @abstractmethod
     def x(self): pass
+
+    @abstractmethod
+    def y(self): pass
+
+    @abstractmethod
+    def z(self): pass
 
     @abstractmethod
     def ry(self, angle: float): pass
@@ -39,3 +52,16 @@ class QuantumDevice(metaclass = ABCMeta):
         finally:
             qubit.reset()
             self.deallocate_qubit(qubit)
+
+    @contextmanager
+    def using_register(self, n_qubits = 1):
+        qubits = [
+            self.allocate_qubit()
+            for idx in range(n_qubits)
+        ]
+        try:
+            yield qubits
+        finally:
+            for qubit in qubits:
+                qubit.reset()
+                self.deallocate_qubit(qubit)
